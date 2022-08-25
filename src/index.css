@@ -139,7 +139,8 @@ textarea::placeholder {
 }
 
 .note-item__delete-button,
-.note-item__archive-button {
+.note-item__archive-button,
+.note-item__make-active-button {
   display: block;
   width: 100%;
   background-color: transparent;
@@ -160,12 +161,20 @@ textarea::placeholder {
   color: #fff263;
 }
 
+.note-item__make-active-button {
+  color: #90f542;
+}
+
 .note-item__archive-button:hover {
   color: #c49000;
 }
 
 .note-item__delete-button:hover {
   color: #b00020;
+}
+
+.note-item__make-active-button:hover {
+  color: #5ea12a;
 }
 
 @media only screen and (min-width: 500px) {
