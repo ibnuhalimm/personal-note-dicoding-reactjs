@@ -18,6 +18,7 @@ class App extends React.Component {
 
     this.state = {
       notes: getInitialData(),
+      searchKeyword: '',
       maxLengthTitle: this.initialTitleLength,
       titleLengthLeft: this.initialTitleLength,
       note: {
@@ -95,12 +96,26 @@ class App extends React.Component {
     }));
   }
 
+  onChangeSearchHandler = (e) => {
+    this.setState((state, props) => ({
+      searchKeyword: e.target.value
+    }));
+  }
+
   render() {
     const activeNotes = this.state.notes.filter(note => {
+      if (this.state.searchKeyword !== '') {
+        return note.archived === false && note.title.toLowerCase().includes(this.state.searchKeyword);
+      }
+
       return note.archived === false;
     });
 
     const archiveNotes = this.state.notes.filter(note => {
+      if (this.state.searchKeyword !== '') {
+        return note.archived === true && note.title.toLowerCase().includes(this.state.searchKeyword);
+      }
+
       return note.archived === true;
     });
 
@@ -113,7 +128,9 @@ class App extends React.Component {
           <div className="note-search">
             <input
               type="text"
-              placeholder="Cari catatan" />
+              placeholder="Cari catatan"
+              onChange={this.onChangeSearchHandler}
+              value={this.state.searchKeyword}/>
           </div>
         </header>
         <main className="note-app__body">
