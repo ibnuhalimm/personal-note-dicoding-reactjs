@@ -11,7 +11,7 @@ const getInitialData = () => ([
     title: "Functional Component",
     body: "Functional component merupakan React component yang dibuat menggunakan fungsi JavaScript. Agar fungsi JavaScript dapat disebut component ia harus mengembalikan React element dan dipanggil layaknya React component.",
     createdAt: '2022-04-14T04:27:34.572Z',
-    archived: true,
+    archived: false,
   },
   {
     id: 3,

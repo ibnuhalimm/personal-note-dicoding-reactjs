@@ -1,13 +1,17 @@
 import React from 'react';
 import './App.css';
 import SectionTitle from './sections/section-title';
-import { getInitialData } from './utils';
-import ActiveNotes from './sections/active-notes';
-import ArchiveNotes from './sections/archive-notes';
+import NoteList from './notes/note-list';
+import { NoteItem, NoteContent, NoteTitle, NoteDate, NoteBody, NoteAction } from './notes/note-item';
+import EmptyMessage from './notes/empty-message';
+import DeleteButton from './notes/delete-button';
+import ArchiveButton from './notes/archive-button';
+import MakeActiveButton from './notes/make-active-button';
+import { getInitialData, showFormattedDate } from './utils';
 import NoteModel from './utils/note-model';
 
 class App extends React.Component {
-  initialTitleLength = 10;
+  initialTitleLength = 20;
 
   constructor(props) {
     super(props);
@@ -24,9 +28,7 @@ class App extends React.Component {
   }
 
   onChangeTitleNoteHandler = (e) => {
-    let currentLength = typeof(e.target.value) !== null
-      ? e.target.value.length
-      : 0;
+    let currentLength = e.target.value.length;
 
     this.setState((state, props) => ({
       titleLengthLeft: state.maxLengthTitle - currentLength,
@@ -49,6 +51,10 @@ class App extends React.Component {
   saveNoteHandler = (e) => {
     e.preventDefault();
 
+    if (this.state.note.title.trim() === '' || this.state.note.body.trim() === '') {
+      return false;
+    }
+
     this.setState((state, props) => ({
       notes: [...state.notes, NoteModel(state.note.title, state.note.body)],
       note: {
@@ -59,16 +65,34 @@ class App extends React.Component {
     }));
   }
 
-  deleteNoteHandler = () => {
-    alert('Delete this note');
+  deleteNoteHandler = (id) => {
+    const existingNotes = this.state.notes.filter(note => {
+      return note.id !== id;
+    });
+
+    this.setState((state, props) => ({
+      notes: existingNotes
+    }));
   }
 
-  archiveNoteHandler = () => {
-    alert('Archive this note');
+  archiveNoteHandler = (id) => {
+    const updatedNotes = this.state.notes.map(note =>
+      note.id === id ? { ...note, archived: true } : note
+    );
+
+    this.setState((state, props) => ({
+      notes: updatedNotes
+    }));
   }
 
-  makeActiveNoteHandler = () => {
-    alert('Make active this note');
+  makeActiveNoteHandler = (id) => {
+    const updatedNotes = this.state.notes.map(note =>
+      note.id === id ? { ...note, archived: false } : note
+    );
+
+    this.setState((state, props) => ({
+      notes: updatedNotes
+    }));
   }
 
   render() {
@@ -98,7 +122,7 @@ class App extends React.Component {
             <SectionTitle>
               Buat Catatan
             </SectionTitle>
-            <form onSubmit={this.saveNoteHandler}>
+            <form onSubmit={(e) => this.saveNoteHandler(e)}>
               <p className="note-input__title__char-limit">
                 Sisa Karakter : {this.state.titleLengthLeft}
               </p>
@@ -123,18 +147,64 @@ class App extends React.Component {
           <SectionTitle>
             Catatan Aktif
           </SectionTitle>
-          <ActiveNotes
-            notes={activeNotes}
-            onClickDeleteButton={this.deleteNoteHandler}
-            onClickArchiveButton={this.archiveNoteHandler}/>
+          {activeNotes.length > 0
+            ? <NoteList>
+                {activeNotes.map((note) => (
+                    <NoteItem key={note.id}>
+                      <NoteContent>
+                        <NoteTitle>
+                          {note.title}
+                        </NoteTitle>
+                        <NoteDate>
+                          {showFormattedDate(note.createdAt)}
+                        </NoteDate>
+                        <NoteBody>
+                          {note.body}
+                        </NoteBody>
+                      </NoteContent>
+                      <NoteAction>
+                        <DeleteButton
+                          onClick={() => this.deleteNoteHandler(note.id)}/>
+                        <ArchiveButton
+                          onClick={() => this.archiveNoteHandler(note.id)}/>
+                      </NoteAction>
+                    </NoteItem>
+                  )
+                )}
+              </NoteList>
+            : <EmptyMessage/>
+          }
 
           <SectionTitle>
             Arsip
           </SectionTitle>
-          <ArchiveNotes
-            notes={archiveNotes}
-            onClickDeleteButton={this.deleteNoteHandler}
-            onClickMakeActiveButton={this.makeActiveNoteHandler}/>
+          {archiveNotes.length > 0
+            ? <NoteList>
+                {archiveNotes.map((note) => (
+                    <NoteItem key={note.id}>
+                      <NoteContent>
+                        <NoteTitle>
+                          {note.title}
+                        </NoteTitle>
+                        <NoteDate>
+                          {showFormattedDate(note.createdAt)}
+                        </NoteDate>
+                        <NoteBody>
+                          {note.body}
+                        </NoteBody>
+                      </NoteContent>
+                      <NoteAction>
+                        <DeleteButton
+                          onClick={() => this.deleteNoteHandler(note.id)}/>
+                        <MakeActiveButton
+                          onClick={() => this.makeActiveNoteHandler(note.id)}/>
+                      </NoteAction>
+                    </NoteItem>
+                  )
+                )}
+              </NoteList>
+            : <EmptyMessage/>
+          }
         </main>
       </>
     );
